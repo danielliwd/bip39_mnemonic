@@ -9,6 +9,8 @@ struct Args {
     /// 助记词单词数量 (12, 15, 18, 21 或 24)
     #[arg(short, long, default_value_t = 12)]
     word_count: usize,
+    #[arg(short, long, default_value_t = false)]
+    quiet: bool,
 }
 
 fn generate_mnemonic(word_count: usize) -> String {
@@ -40,11 +42,16 @@ fn main() {
     }
 
     let mnemonic = generate_mnemonic(args.word_count); // 生成12个单词的助记词
-    println!("生成的助记词: {}", mnemonic);
-    
-    // 可选：显示助记词对应的种子
-    let seed = Mnemonic::parse(mnemonic)
-        .expect("解析助记词失败")
-        .to_seed("");
-    println!("种子 (前16字节): {:?}", &seed[..16]);
+    if args.quiet {
+        // 静默模式：只输出助记词
+        println!("{}", mnemonic);
+    } else {
+        println!("生成的助记词: {}", mnemonic);
+
+        // 可选：显示助记词对应的种子
+        let seed = Mnemonic::parse(mnemonic)
+            .expect("解析助记词失败")
+            .to_seed("");
+        println!("种子 (前16字节): {:?}", &seed[..16]);
+    }
 }
